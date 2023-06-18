@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 
 import { useContext } from 'react';
@@ -13,19 +13,22 @@ const Signup = () => {
 
    const { createUser, updateUser } = useContext(AuthContext);
    const [signUpError, setSignUpError] = useState('');
+   const navigate = useNavigate();
    const handleSignUp = (data) => {
-      console.log(data);
       setSignUpError('');
-      createUser(data.email, data.password)
+      createUser(data.email, data.password, data.displayName)
          .then((result) => {
             const user = result.user;
             console.log(user);
-            toast('user create successfully');
+            toast('User Created Successfully.');
             const userInfo = {
                displayName: data.name,
             };
+
             updateUser(userInfo)
-               .then(() => {})
+               .then(() => {
+                  navigate('/');
+               })
                .catch((err) => console.log(err));
          })
          .catch((error) => {
@@ -42,18 +45,17 @@ const Signup = () => {
             <form onSubmit={handleSubmit(handleSignUp)}>
                <div className='form-control w-full max-w-xs'>
                   <label className='label'>
+                     {' '}
                      <span className='label-text'>Name</span>
                   </label>
                   <input
                      type='text'
-                     {...register('name', { required: 'name is requard' })}
+                     {...register('name', {
+                        required: 'Name is Required',
+                     })}
                      className='input input-bordered w-full max-w-xs'
                   />
-                  {errors.name && (
-                     <p className='text-red-600 ' role='alert'>
-                        {errors.name?.message}
-                     </p>
-                  )}
+                  {errors.name && <p className='text-red-500'>{errors.name.message}</p>}
                </div>
                <div className='form-control w-full max-w-xs'>
                   <label className='label'>
